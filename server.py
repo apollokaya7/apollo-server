@@ -1,31 +1,18 @@
+import os
 from flask import Flask, request, jsonify
 
 app = Flask(__name__)
 
-# einfache Datenbank im Speicher
-licenses = {
-    "APOLLO-1234": None
-}
+@app.route("/")
+def home():
+    return "Apollo Server Online"
 
 @app.route("/check", methods=["POST"])
 def check():
-    data = request.json
-    key = data["key"]
-    hwid = data["hwid"]
+    return jsonify({"valid": True})
 
-    if key not in licenses:
-        return jsonify({"valid": False})
+port = int(os.environ.get("PORT", 10000))
 
-    # erste Aktivierung
-    if licenses[key] is None:
-        licenses[key] = hwid
-        return jsonify({"valid": True, "msg": "Activated"})
+if __name__ == "__main__":
+    app.run(host="0.0.0.0", port=port)
 
-    # HWID check
-    if licenses[key] == hwid:
-        return jsonify({"valid": True, "msg": "OK"})
-
-    return jsonify({"valid": False, "msg": "HWID blocked"})
-
-
-app.run(port=5000)
